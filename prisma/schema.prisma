@@ -1,0 +1,68 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Bhajan {
+  id            String            @id @default(cuid())
+
+  title         String
+  titleEnglish  String?
+
+  language      String
+
+  // Main refrain / chorus
+  mainText      String
+
+   // Optional YouTube/audio reference
+  mediaUrl      String?
+
+  // Background information
+  description   String?
+
+  // Optional categorization
+  categories       Category[]
+
+  paragraphs    BhajanParagraph[]
+
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+}
+
+model BhajanParagraph {
+  id          String   @id @default(cuid())
+
+  bhajanId    String
+  bhajan      Bhajan   @relation(fields: [bhajanId], references: [id], onDelete: Cascade)
+
+  orderNo     Int
+  text        String
+
+  createdAt   DateTime @default(now())
+
+  @@index([bhajanId])
+  @@unique([bhajanId, orderNo])
+}
+
+model Admin {
+  id        String @id @default(cuid())
+  email     String @unique
+  createdAt DateTime @default(now())
+}
+
+model Category {
+  id        String   @id @default(cuid())
+  name      String   @unique
+
+  bhajans   Bhajan[]
+}
