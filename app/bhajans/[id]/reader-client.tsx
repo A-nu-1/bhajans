@@ -1,20 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
-
-
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Bhajan, Paragraph } from "@/types/bhajans";
-
 import { trans } from "@/lib/transliterate";
-
-import {
-  isFavorite,
-  toggleFavorite,
-} from "@/lib/favorites";
+import { Download } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, } from "@/components/ui/dropdown-menu";
+import { isFavorite, toggleFavorite, } from "@/lib/favorites";
 
 export default function ReaderClient({
   bhajan,
@@ -85,99 +79,59 @@ export default function ReaderClient({
   }
 
   return (
-    <div className="max-w-3xl mx-auto p-4 space-y-4">
+    <div className="max-w-5xl mx-auto p-4 space-y-4">
 
 
-      <div className="flex gap-2">
-        <a href={`/api/export/bhajan/txt/${bhajan.id}`}>
-          <Button type="button">Download TXT</Button>
-        </a>
-
-        <a href={`/api/export/bhajan/docx/${bhajan.id}`}>
-          <Button type="button">Download Word</Button>
-        </a>
-
+      <div className="flex gap-1 justify-between">
+        <div className="flex gap-1">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="w-8 text-2xl hover:scale-110 hover:bg-transparent border-0 focus:bg-transparent active:bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0">
+                <Download className="rounded-full stroke-[1px] min-w-6 min-h-6" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="flex flex-col items-center  gap-1 p-1 m-1">
+              <a href={`/api/export/bhajan/txt/${bhajan.id}`}><Button variant="outline">Download TXT</Button></a>
+              <a href={`/api/export/bhajan/docx/${bhajan.id}`}><Button variant="outline">Download Word</Button></a>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <Button variant="outline" onClick={handleFavorite}>{favorite ? "❤️" : "🤍"}</Button>
+        </div>
+        <div className="flex gap-1">
+          <Button variant="outline" onClick={() => setFontSize((s) => Math.max(14, s - 2))}>A-</Button>
+          <Button variant="outline" onClick={() => setFontSize((s) => Math.min(32, s + 2))}>A+</Button>
+          <Button variant="outline" onClick={() => setLang("roman")}>EN</Button>
+          <Button variant="outline" onClick={() => setLang("kn")}>KN</Button>
+        </div>
       </div>
-
-      <Button
-        variant="outline"
-        onClick={handleFavorite}
-      >
-        {favorite ? "❤️ Favorited" : "🤍 Favorite"}
-      </Button>
-
       {/* TITLE */}
       <Card>
 
-        <CardHeader>
-          <CardTitle>{bhajan.title}</CardTitle>
-        </CardHeader>
+        <CardHeader><CardTitle className="text-2xl">{bhajan.title}</CardTitle></CardHeader>
 
         {bhajan.mainText && (
-          <CardContent
-            className="leading-relaxed whitespace-pre-line"
-            style={{ fontSize: `${fontSize}px` }}
-          >
+          <CardContent className="leading-relaxed whitespace-pre-line" style={{ fontSize: `${fontSize}px` }}>
             {getText(bhajan.mainText)}
-
           </CardContent>
         )}
       </Card>
 
       {/* TOP CONTROLS */}
-      <Card>
-        <CardContent className="flex gap-2 items-center pt-4">
+      {total > 1 && (
+        <Card>
+          <CardContent className="flex gap-2 items-center  justify-between">
 
-          <Button
-            variant="outline"
-            onClick={() => setFontSize((s) => Math.max(14, s - 2))}
-          >
-            A-
-          </Button>
+            <Button variant="outline" onClick={() => setIndex((i) => (i - 1 + total) % total)}>◀ Prev</Button>
 
-          <Button
-            variant="outline"
-            onClick={() => setFontSize((s) => Math.min(32, s + 2))}
-          >
-            A+
-          </Button>
+            <div className="flex gap-1">
+              <Input className="w-24" placeholder="Go to para #" value={goTo} onChange={(e) => setGoTo(e.target.value)} />
+              <Button variant="outline" onClick={handleGo}>Go</Button>
+            </div>
+            <Button variant="outline" onClick={() => setIndex((i) => (i + 1) % total)}>Next ▶</Button>
 
-
-          <div className="flex gap-2">
-            <Button onClick={() => setLang("roman")}>EN</Button>
-            <Button onClick={() => setLang("kn")}>KN</Button>
-
-          </div>
-
-          <Button
-            variant="outline"
-            onClick={() =>
-              setIndex((i) => Math.max(i - 1, 0))
-            }
-          >
-            ◀ Prev
-          </Button>
-
-          <Input
-            className="w-24"
-            placeholder="Go #"
-            value={goTo}
-            onChange={(e) => setGoTo(e.target.value)}
-          />
-
-          <Button onClick={handleGo}>Go</Button>
-
-          <Button
-            variant="outline"
-            onClick={() =>
-              setIndex((i) => Math.min(i + 1, total - 1))
-            }
-          >
-            Next ▶
-          </Button>
-
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      )}
 
       {/* PARAGRAPH (SWIPE ENABLED AREA) */}
       <Card
@@ -186,7 +140,7 @@ export default function ReaderClient({
         className="min-h-[250px] select-none"
       >
         <CardHeader>
-          <CardTitle className="text-sm text-muted-foreground">
+          <CardTitle className="text-sm text-muted-foreground text-center">
             Paragraph {index + 1} / {total}
           </CardTitle>
         </CardHeader>
@@ -200,35 +154,17 @@ export default function ReaderClient({
       </Card>
 
       {/* BOTTOM NAV */}
-      <Card>
-        <CardContent className="flex justify-between pt-4">
+      {total > 1 && (
+        <Card>
+          <CardContent className="flex justify-between">
 
-          <Button
-            variant="outline"
-            onClick={() =>
-              setIndex((i) => Math.max(i - 1, 0))
-            }
-          >
-            ◀ Prev
-          </Button>
-          <Button
-            variant="outline"
-            onClick={() => setFontSize(18)}
-          >
-            Reset
-          </Button>
-          <Button
-            variant="outline"
-            onClick={() =>
-              setIndex((i) => Math.min(i + 1, total - 1))
-            }
-          >
-            Next ▶
-          </Button>
+            <Button variant="outline" onClick={() => setIndex((i) => (i - 1 + total) % total)}>◀ Prev</Button>
+            <Button variant="outline" onClick={() => setFontSize(18)}>Reset</Button>
+            <Button variant="outline" onClick={() => setIndex((i) => (i + 1) % total)}>Next ▶</Button>
 
-        </CardContent>
-      </Card>
-
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }

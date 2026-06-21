@@ -84,7 +84,7 @@ export default function EditBhajanForm({
   }
 
   return (
-    <div className="max-w-3xl mx-auto p-6 space-y-6">
+    <div className="max-w-5xl mx-auto p-6 space-y-6">
 
       <Card>
         <CardHeader>
@@ -202,7 +202,7 @@ export default function EditBhajanForm({
                       key={cat.id}
                       className="flex gap-2 items-center"
                     >
-                      <Input
+                      <input
                         type="checkbox"
                         checked={selectedCategories.includes(cat.id)}
                         onChange={() => toggleCategory(cat.id)}

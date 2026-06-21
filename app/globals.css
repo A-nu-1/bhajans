@@ -52,6 +52,8 @@
 
 :root {
   --background: oklch(1 0 0);
+  --bg1: oklch(1 0 0);;
+  --bg2: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
@@ -87,6 +89,8 @@
 
 .dark {
   --background: oklch(0.145 0 0);
+  --bg1: oklch(0.145 0 0);
+  --bg2: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);
   --card-foreground: oklch(0.985 0 0);
@@ -129,4 +133,31 @@
   html {
     @apply font-sans;
   }
+}
+
+
+
+
+.sunset {
+  --bg1: oklch(63.112% 0.25465 29.786);
+  --bg2: oklch(87.3% 0.17854 92.233);
+}
+
+.beach {
+  --bg1: oklch(82.722% 0.14184 214.64);
+  --bg2: oklch(88.147% 0.21271 153.979);
+}
+
+.peach {
+  --bg1: oklch(66.815% 0.29022 336.638);
+  --bg2: oklch(95.977% 0.20687 108.572);
+}
+
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.hide-scrollbar {
+  scrollbar-width: none;
 }

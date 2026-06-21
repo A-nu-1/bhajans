@@ -3,7 +3,7 @@ import { isAdmin } from "@/lib/is-admin";
 import { redirect } from "next/navigation";
 
 import CreateCategoryForm from "./create-category-form";
-import DeleteCategoryButton from "./delete-category-button";
+import CategoryRow from "./category-row";
 
 export default async function CategoriesPage() {
   const admin = await isAdmin();
@@ -29,16 +29,10 @@ export default async function CategoriesPage() {
 
       <div className="space-y-2">
         {categories.map((category) => (
-          <div
-            key={category.id}
-            className="flex justify-between items-center border rounded p-3"
-          >
-            <span>{category.name}</span>
-
-            <DeleteCategoryButton
-              categoryId={category.id}
-            />
-          </div>
+          <CategoryRow
+  key={category.id}
+  category={category}
+/>
         ))}
       </div>
 

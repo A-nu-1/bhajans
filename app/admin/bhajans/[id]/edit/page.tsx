@@ -1,11 +1,20 @@
 import { prisma } from "@/lib/prisma";
 import EditBhajanForm from "./edit-bhajan-form";
+import { isAdmin } from "@/lib/is-admin";
+import { redirect } from "next/navigation"; 
 
 export default async function EditBhajanPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
+
+  const admin = await isAdmin();
+  
+    if (!admin) {
+      redirect("/bhajans");
+    }
+
   const { id } = await params;
 
   const bhajan = await prisma.bhajan.findUnique({

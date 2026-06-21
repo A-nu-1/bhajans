@@ -4,11 +4,20 @@ import { isAdmin } from "@/lib/is-admin";
 import { Button } from "@/components/ui/button";
 import DeleteBhajanButton from "@/components/delete-bhajan-button";
 
+import { redirect } from "next/navigation"; 
+
 export default async function BhajanDetailPage({
   params,
 }: {
    params: Promise<{ id: string }>;
 }) {
+
+    const admin = await isAdmin();
+  
+    if (!admin) {
+      redirect("/bhajans");
+    }
+    
   const { id } = await params;
 
   const bhajan = await prisma.bhajan.findUnique({
@@ -20,7 +29,7 @@ export default async function BhajanDetailPage({
     return <div>Bhajan not found</div>;
   }
 
-  const admin = await isAdmin();
+
 
   return (
     <div className="max-w-3xl mx-auto p-6 space-y-6">

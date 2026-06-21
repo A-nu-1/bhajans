@@ -63,6 +63,6 @@ model Admin {
 model Category {
   id        String   @id @default(cuid())
   name      String   @unique
-
+image     String?
   bhajans   Bhajan[]
 }

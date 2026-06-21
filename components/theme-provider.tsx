@@ -12,6 +12,13 @@ export function Providers({
       attribute="class"
       defaultTheme="system"
       enableSystem
+      themes={[
+    "light",
+    "dark",
+    "sunset",
+    "beach",
+    "peach",
+  ]}
     >
       {children}
     </ThemeProvider>

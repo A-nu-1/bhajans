@@ -1,42 +1,85 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Maximize, Database ,SmilePlus  } from 'lucide-react';
+import { isAdmin } from "@/lib/is-admin";
+import { redirect } from "next/navigation"; 
 
-export default async function BhajanListPage() {
+export default async function BhajanListPage({
+  searchParams,
+}: {
+  searchParams: Promise<{
+    search?: string;
+  }>;
+}) {
+
+ const admin = await isAdmin();
+  if (!admin) {
+    redirect("/bhajans");
+  }
+
+  const { search } = await searchParams;
+
   const bhajans = await prisma.bhajan.findMany({
-    orderBy: { createdAt: "desc" },
-    include: { paragraphs: true },
+    where: search
+      ? {
+          OR: [
+            {
+              title: {
+                contains: search,
+                mode: "insensitive",
+              },
+            },
+            {
+              titleEnglish: {
+                contains: search,
+                mode: "insensitive",
+              },
+            },
+            {
+              mainText: {
+                contains: search,
+                mode: "insensitive",
+              },
+            },
+          ],
+        }
+      : {},
+    orderBy: {
+      createdAt: "desc",
+    },
+    include: {
+      paragraphs: true,
+    },
   });
 
   return (
-    <div className="max-w-3xl mx-auto p-6 space-y-6">
-      <div className="flex justify-between items-center">
+    <div className="lg:min-w-5xl md:min-w-3xl mx-auto p-6 space-y-6">
+      <div className="flex justify-between items-center mx-3">
+        <Database/>
         <h1 className="text-2xl font-bold">All Bhajans</h1>
-
-        <Link href="/admin/bhajans/new">
-          <Button>+ New Bhajan</Button>
-        </Link>
+        <Link href="/admin/bhajans/new"><SmilePlus /></Link>
       </div>
 
       {bhajans.length === 0 ? (
-        <p className="text-gray-500">No bhajans yet</p>
+        <p>No bhajans yet</p>
       ) : (
         bhajans.map((b) => (
-          <Link key={b.id} href={`/admin/bhajans/${b.id}`}>
-            <Card className="hover:shadow-md transition cursor-pointer">
-              <CardHeader>
-                <CardTitle>{b.title}</CardTitle>
+          
+            
+            <Card className="hover:shadow-md transition cursor-pointer my-3">
+              <CardHeader className="flex justify-between items-center">
+                <CardTitle>{b.title.length > 20? b.title.slice(0, 20) + "...": b.title} // {b.titleEnglish && b.titleEnglish.length > 20? b.titleEnglish.slice(0, 20) + "...": b.titleEnglish}</CardTitle>
+                <Link key={b.id} href={`/admin/bhajans/${b.id}`}><Maximize className="h-5"/></Link>            
               </CardHeader>
 
               <CardContent className="space-y-2">
-                <p className="text-sm text-gray-600">{b.mainText}</p>
-                <p className="text-xs text-gray-400">
-                  Paragraphs: {b.paragraphs.length}
-                </p>
+                <p className="text-sm ">{b.description && b.description.length > 50 ? b.description?.slice(0,50) + "...":b.description}</p>
+                <p className="text-sm "> {b.mainText.length > 50? b.mainText.slice(0, 50) + "...": b.mainText}</p>                
+                <p className="text-xs ">Paragraphs: {b.paragraphs.length}</p>
               </CardContent>
             </Card>
-          </Link>
+          
         ))
       )}
     </div>

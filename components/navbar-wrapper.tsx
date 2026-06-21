@@ -16,5 +16,5 @@ export default async function NavbarWrapper() {
     isAdmin = !!admin;
   }
 
-  return <NavbarClient isAdmin={isAdmin} />;
+  return <NavbarClient isAdmin={isAdmin} session={session} />;
 }
